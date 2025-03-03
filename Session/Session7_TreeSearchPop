@@ -1,0 +1,120 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+typedef struct tnode {
+    int id;
+    char name[50];
+    struct tnode *left, *right;
+} tnode;
+
+tnode *createNode(int id, const char *name) {
+    tnode *newNode = (tnode *) malloc(sizeof(tnode));
+    newNode->id = id;
+    strcpy(newNode->name, name);
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+tnode *insert(tnode *root, int id, const char *name) {
+    if (!root)
+        return createNode(id, name);
+    else if (id < root->id)
+        root->left = insert(root->left, id, name);
+    else if (id > root->id)
+        root->right = insert(root->right, id, name);
+    else if (id == root->id)
+        puts("Duplicate ID");
+    return root;
+}
+
+tnode *search(tnode *root, int id) {
+    if (!root) {
+        puts("Not found");
+        return NULL;
+    }
+    else if (root->id == id)
+        return root;
+    else if (id < root->id)
+        return search(root->left, id);
+    else
+        return search(root->right, id);
+}
+
+tnode *update(tnode *root, int id, const char *name) {
+    if (!root) {
+        puts("Not found");
+        return NULL;
+    }
+    else if (root->id == id)
+        strcpy(root->name, name);
+    else if (id < root->id)
+        return update(root->left, id, name);
+    else if (id > root->id)
+        return update(root->right, id, name);
+    return root;
+}
+
+tnode *findSuccessor(tnode *root) {
+    tnode *current = root;
+    while (current && current->left)
+        current = current->left;
+    return current;
+}
+
+tnode *delet(tnode *root, int id) {
+    if (!root)
+        return root;
+    else if (id < root->id)
+        root->left = delet(root->left, id);
+    else if (id > root->id)
+        root->right = delet(root->right, id);
+    else {
+        if (!root->left) {
+            tnode *temp = root->right;
+            free(root);
+            return temp;
+        } else if (!root->right) {
+            tnode *temp = root->left;
+            free(root);
+            return temp;
+        }
+        tnode *temp = findSuccessor(root->right);
+        root->id = temp->id;
+        strcpy(root->name, temp->name);
+        root->right = delet(root->right, temp->id);
+    }
+    return root;
+}
+
+tnode *deleteAll(tnode *root) {
+    while (root)
+        root = delet(root, root->id);
+    return root;
+}
+
+void inorder(tnode *root) {
+    if (!root)
+        return;
+    inorder(root->left);
+    printf("(%d) %s\n", root->id, root->name);
+    inorder(root->right);
+}
+
+int main(){
+    tnode *root = NULL;
+    root = insert(root, 100, "Louis");
+    root = insert(root, 101, "Brandon");
+    root = insert(root, 90, "Angeline");
+    root = insert(root, 103, "Bryant");
+    root = insert(root, 77, "Calvin");
+    root = insert(root, 95, "Giselle");
+    root = insert(root, 94, "Nathan");
+    root = insert(root, 93, "Marchelle");
+    inorder(root);
+    root = deleteAll(root);
+    puts("Delete:");
+    inorder(root);
+    return 0;
+}
