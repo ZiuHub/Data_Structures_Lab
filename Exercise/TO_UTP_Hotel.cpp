@@ -176,13 +176,13 @@ void pop(){
     else{
         found = true;
         Booking* temp = booking[key];
-        while(temp && strcmp(temp->next->bookingId, id)){
+        while(temp->next && strcmp(temp->next->bookingId, id)){
             temp = temp->next;
         }
         Booking* toPop = temp->next;
         temp->next = toPop->next;
         free(toPop);
-        puts("Failed to Delete, There is No Data!");
+        printf("BookingID %s is Successfully Deleted!\n", id);
         enterToContinue();
     }
     if(!found){
